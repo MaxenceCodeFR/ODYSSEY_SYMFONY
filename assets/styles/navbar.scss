@@ -1,0 +1,11 @@
+$border-color:black;
+
+.navbar{
+    display: flex;
+    width: 100%;
+    position: sticky;
+}
+
+.navbar-nav{
+    border: solid 1px $border-color !important;
+}
