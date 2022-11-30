@@ -17,7 +17,8 @@
 		<p>{{season.description}}</p>
 
 		<a href="{{ path("program_season_show", { programid: program.id, seasonid: season.id }) }}">
-			Retour a la vue générale de la saison
+			vers saison
+			{{season.number}}
 		</a>
 	{% endfor %}
 </div>
