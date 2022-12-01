@@ -6,4 +6,11 @@
 {% block body %}
 	<h1>{{ clac }}</h1>
 	{# <img src="{{ asset('build/chwal.jpg') }}" alt="chwal"/> #}
+	<a href="{{ path('program_index') }}">
+		Feuilletage des séries
+	</a><br>
+	<a href="{{ path('category_index') }}">
+		Les genres disponible
+	</a>
+
 {% endblock %}
