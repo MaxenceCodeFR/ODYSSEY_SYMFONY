@@ -6,11 +6,23 @@
 {% block body %}
 	<h1>{{ clac }}</h1>
 	{# <img src="{{ asset('build/chwal.jpg') }}" alt="chwal"/> #}
-	<a href="{{ path('program_index') }}">
-		Feuilletage des séries
-	</a><br>
-	<a href="{{ path('category_index') }}">
-		Les genres disponible
-	</a>
+	<div>
+		<a href="{{ path('program_index') }}">
+			Feuilletage des séries
+		</a><br>
+	</div>
+	<div>
+		<a href="{{ path('category_index') }}">
+			Les genres disponible
+		</a>
+	</div>
+	<div>
+		<a href="{{ path('app_season_index')}}">Liste de toute les saisons</a>
+	</div>
+	<div>
+		<a href="{{ path('app_episode_index')}}">
+			Liste de tout les épisodes
+		</a>
+	</div>
 
 {% endblock %}
