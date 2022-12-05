@@ -8,7 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+
+#[UniqueEntity('title')]
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
 class Program
 {
@@ -18,10 +22,12 @@ class Program
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(name: 'title', type: 'string', length: 50, unique: true)]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire')]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Le synopsis est obligatoire')]
     private ?string $synopsis = null;
 
     #[ORM\Column(length: 255, nullable: true)]
