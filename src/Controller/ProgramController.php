@@ -12,13 +12,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 #[Route('/program', name: "program_")]
 class ProgramController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(ProgramRepository $programRepository): Response
+    public function index(ProgramRepository $programRepository, RequestStack $requestStack): Response
     {
+        $session = $requestStack->getSession();
+        if (!$session->has('total')) {
+            $session->set('total', 0);
+        }
+        $total = $session->get('total');
         $programs = $programRepository->findAll();
 
         return $this->render(
@@ -35,7 +42,8 @@ class ProgramController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $programRepository->save($program, true);
-            return $this->redirectToRoute('program_index');
+
+            $this->addFlash('bravo', 'nouvelle série crée');
         }
         return $this->renderForm('program/new.html.twig', [
             'form' => $form,
@@ -71,5 +79,14 @@ class ProgramController extends AbstractController
             'program' => $program,
             'episode' => $episode,
         ]);
+    }
+    #[Route('/{id}', name: 'delete', methods: ['POST'])]
+    public function delete(Request $request, Program $program, ProgramRepository $programRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $program->getId(), $request->request->get('_token'))) {
+            $programRepository->remove($program, true);
+        }
+
+        return $this->redirectToRoute('program_index', [], Response::HTTP_SEE_OTHER);
     }
 }

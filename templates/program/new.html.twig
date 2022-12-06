@@ -6,4 +6,12 @@
 	<button type="submit">Add program</button>
 	{{ form_end(form) }}
 
+	{% for category, messages in app.flashes %}
+		{% for message in messages %}
+			<div class="alert-success alert-{{ category }}">
+				{{ message }}
+			</div>
+		{% endfor %}
+	{% endfor %}
+
 {% endblock %}
