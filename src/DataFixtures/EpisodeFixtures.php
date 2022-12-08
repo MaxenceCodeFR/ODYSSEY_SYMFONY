@@ -22,7 +22,7 @@ class EpisodeFixtures extends Fixture implements DependentFixtureInterface
          * de te générer toutes les données que tu souhaites
          */
 
-        for ($i = 0; $i < 250; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $episode = new Episode();
             //Ce Faker va nous permettre d'alimenter l'instance de Episode que l'on souhaite ajouter en base
             $episode->setNumber($faker->numberBetween(1, 10));

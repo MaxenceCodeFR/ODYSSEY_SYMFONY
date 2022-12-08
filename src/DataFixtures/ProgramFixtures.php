@@ -38,6 +38,8 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
         ],
 
     ];
+
+    public static int $numProgram = 0;
     public function load(ObjectManager $manager): void
     {
         foreach (self::PROGRAMLIST as $key => $programInf) {
@@ -47,6 +49,7 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
             $program->setCategory($this->getReference($programInf["Category"]));
             $manager->persist($program);
             $this->addReference('program_' . $key, $program);
+            self::$numProgram++;
         }
         $manager->flush();
     }
