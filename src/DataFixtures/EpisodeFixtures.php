@@ -2,18 +2,24 @@
 
 namespace App\DataFixtures;
 
+use Faker\Factory;
 use App\Entity\Episode;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\DataFixtures\SeasonFixtures;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 //Tout d'abord nous ajoutons la classe Factory de FakerPhp
-use Faker\Factory;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class EpisodeFixtures extends Fixture implements DependentFixtureInterface
 {
+    public function __construct(private readonly SluggerInterface $slugger)
+    {
+    }
     public function load(ObjectManager $manager): void
     {
+
         //Puis ici nous demandons à la Factory de nous fournir un Faker
         $faker = Factory::create();
 
@@ -26,7 +32,10 @@ class EpisodeFixtures extends Fixture implements DependentFixtureInterface
             $episode = new Episode();
             //Ce Faker va nous permettre d'alimenter l'instance de Episode que l'on souhaite ajouter en base
             $episode->setNumber($faker->numberBetween(1, 10));
-            $episode->setTitle($faker->title());
+            $episode->setDuration($faker->time('i'));
+            $episode->setTitle($faker->sentence(4));
+            $slug = $this->slugger->slug($episode->getTitle());
+            $episode->setSlug($slug);
             $episode->setSynopsis($faker->paragraphs(1, true));
             $episode->setSeason($this->getReference('season_' . $faker->numberBetween(0, 9)));
             $manager->persist($episode);

@@ -2,18 +2,23 @@
 
 namespace App\Controller;
 
-use App\Entity\Program;
 use App\Entity\Season;
 use App\Entity\Episode;
+use App\Entity\Program;
+// use App\Controller\Email;
+use Symfony\Component\Mime\Email;
 use App\Form\ProgramType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
+use App\Service\ProgramDuration;
 use App\Repository\ProgramRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/program', name: "program_")]
 class ProgramController extends AbstractController
@@ -35,13 +40,25 @@ class ProgramController extends AbstractController
     }
 
     #[Route('/new', name: 'new')]
-    public function new(Request $request, ProgramRepository $programRepository)
+    public function new(Request $request, MailerInterface $mailer, ProgramRepository $programRepository, SluggerInterface $slugger)
     {
         $program = new Program();
         $form = $this->createForm(ProgramType::class, $program);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $slug = $slugger->slug($program->getTitle());
+            $program->setSlug($slug);
+
             $programRepository->save($program, true);
+
+            $email = (new Email())
+                ->from($this->getParameter('mailer_from'))
+                ->to('wilder@wildcodeschool.fr')
+                ->subject('Une nouvelle série vient d\'être publiée !')
+                ->html($this->renderView('Program/newProgramEmail.html.twig', ['program' => $program]));
+
+            $mailer->send($email);
 
             $this->addFlash('success', 'nouvelle série crée');
         }
@@ -50,14 +67,17 @@ class ProgramController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', requirements: ['id' => '\d+'], methods: ['GET'], name: 'show')]
-    public function show(int $id, Program $program): Response
+    #[Route('/{slug}', methods: ['GET'], name: 'show')]
+    public function show(Program $program, ProgramDuration $programDuration): Response
     {
         // $program = $programRepository->findOneBy(['id' => $id]);
         if (!$program) {
-            throw $this->createNotFoundException("J'ai pas de série avec cet id " . $id);
+            throw $this->createNotFoundException("J'ai pas de série avec cet id ");
         }
-        return $this->render('program/show.html.twig', ['program' => $program]);
+        return $this->render('program/show.html.twig', [
+            'program' => $program,
+            'programDuration' => $programDuration->calculate($program)
+        ]);
     }
 
     #[Route('/{programid}/season/{seasonid}', methods: ['GET'], name: 'season_show')]

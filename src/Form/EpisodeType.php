@@ -6,6 +6,7 @@ use App\Entity\Episode;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class EpisodeType extends AbstractType
 {
@@ -15,6 +16,7 @@ class EpisodeType extends AbstractType
             ->add('title')
             ->add('number')
             ->add('synopsis')
+            ->add('duration', IntegerType::class)
             ->add('season', null, ['choice_label' => 'number']);
     }
 
